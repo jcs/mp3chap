@@ -1,5 +1,5 @@
 //
-// id3chap
+// mp3chap
 // Copyright (c) 2017 joshua stein <jcs@jcs.org>
 //
 // Redistribution and use in source and binary forms, with or without

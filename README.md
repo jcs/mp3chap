@@ -1,4 +1,4 @@
-## id3chap
+## mp3chap
 
 A command-line tool for adding ID3 chapters to an MP3 file.
 Most of the grunt work is done by
@@ -7,14 +7,14 @@ of the `id3-go` Go library.
 
 ### Installation
 
-    go get github.com/jcs/id3chap
+    go get github.com/jcs/mp3chap
 
-This will fetch, compile, and install an `id3chap` binary as `~/go/bin/id3chap` (or
+This will fetch, compile, and install an `mp3chap` binary as `~/go/bin/mp3chap` (or
 wherever your `$GOPATH` is).
 
 ### Usage
 
-    id3chap file.mp3 0 "chapter 1 is great" 123 "chapter 2 is ok" 456 "chapter 3 is boring"
+    mp3chap file.mp3 0 "chapter 1 is great" 123 "chapter 2 is ok" 456 "chapter 3 is boring"
 
 The first argument is the path to the MP3 file, then pairs of arguments each containing
 a start time in seconds, and the chapter title.
