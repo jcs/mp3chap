@@ -103,17 +103,17 @@ func main() {
 	mp3.DeleteFrames("CTOC")
 	mp3.DeleteFrames("CHAP")
 
+	// build a new TOC referencing each chapter
+	ctocft := id3v2.V23FrameTypeMap["CTOC"]
+	toc := id3v2.NewTOCFrame(ctocft, "toc", true, true, tocchaps)
+	mp3.AddFrames(toc)
+
 	// add each chapter
 	chapft := id3v2.V23FrameTypeMap["CHAP"]
 	for _, c := range chaps {
 		ch := id3v2.NewChapterFrame(chapft, c.element, c.startSecs, c.endSecs, 0, 0, true, c.title, "", "")
 		mp3.AddFrames(ch)
 	}
-
-	// build a new TOC referencing each chapter
-	ctocft := id3v2.V23FrameTypeMap["CTOC"]
-	toc := id3v2.NewTOCFrame(ctocft, "toc", true, true, tocchaps)
-	mp3.AddFrames(toc)
 
 	mp3.Close()
 }
