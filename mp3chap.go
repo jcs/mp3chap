@@ -32,6 +32,7 @@ import (
 	"fmt"
 	id3 "github.com/jcs/id3-go"
 	id3v2 "github.com/jcs/id3-go/v2"
+	"log"
 	"os"
 	"strconv"
 )
@@ -56,7 +57,7 @@ func main() {
 	fn := os.Args[1]
 	mp3, err := id3.Open(fn)
 	if err != nil {
-		fmt.Errorf("can't open %s: %s", fn, err)
+		log.Fatal("can't open %s: %s", fn, err)
 	}
 
 	chaps := make([]Chapter, 0)
@@ -69,7 +70,7 @@ func main() {
 
 		startSecs, err := strconv.ParseUint(os.Args[x], 10, 32)
 		if err != nil {
-			fmt.Errorf("failed parsing seconds %#v: %v", os.Args[x], err)
+			log.Fatal("failed parsing seconds %#v: %v", os.Args[x], err)
 		}
 
 		element := fmt.Sprintf("chp%d", len(chaps))
@@ -89,12 +90,15 @@ func main() {
 	// and the last one ends when the file does
 	tlenf := mp3.Frame("TLEN")
 	if tlenf == nil {
-		fmt.Errorf("can't find TLEN frame, don't know total duration")
+		log.Fatal("can't find TLEN frame, don't know total duration")
 	}
-	tlenft := tlenf.(*id3v2.TextFrame)
+	tlenft, ok := tlenf.(*id3v2.TextFrame)
+	if !ok {
+		log.Fatal("can't convert TLEN to TextFrame")
+	}
 	tlen, err := strconv.ParseUint(tlenft.Text(), 10, 32)
 	if err == nil {
-		fmt.Errorf("can't parse TLEN value %#v\n", tlenft.Text())
+		log.Fatal("can't parse TLEN value %#v\n", tlenft.Text())
 	}
 
 	chaps[len(chaps)-1].endSecs = uint32(tlen)
