@@ -62,8 +62,10 @@ func main() {
 
 	chaps := make([]Chapter, 0)
 	tocchaps := make([]string, 0)
+	finalEnd := uint64(0)
 
-	for x := 2; x < len(os.Args)-1; x += 2 {
+	x := 2
+	for ; x < len(os.Args)-1; x += 2 {
 		if x+1 > len(os.Args)-2+1 {
 			usage()
 		}
@@ -80,6 +82,14 @@ func main() {
 		chaps = append(chaps, chap)
 	}
 
+	// if there is a final odd arg, use it as the final chapter end
+	if x < len(os.Args) {
+		finalEnd, err = strconv.ParseUint(os.Args[x], 10, 32)
+		if err != nil {
+			log.Fatal("failed parsing final seconds %#v: %v", os.Args[x], err)
+		}
+	}
+
 	// each chapter ends where the next one starts
 	for x := range chaps {
 		if x < len(chaps)-1 {
@@ -87,21 +97,25 @@ func main() {
 		}
 	}
 
-	// and the last one ends when the file does
-	tlenf := mp3.Frame("TLEN")
-	if tlenf == nil {
-		log.Fatal("can't find TLEN frame, don't know total duration")
-	}
-	tlenft, ok := tlenf.(*id3v2.TextFrame)
-	if !ok {
-		log.Fatal("can't convert TLEN to TextFrame")
-	}
-	tlen, err := strconv.ParseUint(tlenft.Text(), 10, 32)
-	if err == nil {
-		log.Fatal("can't parse TLEN value %#v\n", tlenft.Text())
-	}
+	if finalEnd == 0 {
+		// and the last one ends when the file does
+		tlenf := mp3.Frame("TLEN")
+		if tlenf == nil {
+			log.Fatal("can't find TLEN frame, don't know total duration")
+		}
+		tlenft, ok := tlenf.(*id3v2.TextFrame)
+		if !ok {
+			log.Fatal("can't convert TLEN to TextFrame")
+		}
+		tlen, err := strconv.ParseUint(tlenft.Text(), 10, 32)
+		if err == nil {
+			log.Fatal("can't parse TLEN value %#v\n", tlenft.Text())
+		}
 
-	chaps[len(chaps)-1].endSecs = uint32(tlen)
+		chaps[len(chaps)-1].endSecs = uint32(tlen)
+	} else {
+		chaps[len(chaps)-1].endSecs = uint32(finalEnd)
+	}
 
 	// ready to modify the file, clear out what's there
 	mp3.DeleteFrames("CTOC")
