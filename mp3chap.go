@@ -87,6 +87,8 @@ func main() {
 		finalEnd, err = strconv.ParseUint(os.Args[x], 10, 32)
 		if err != nil {
 			log.Fatal("failed parsing final seconds %#v: %v", os.Args[x], err)
+		} else {
+			finalEnd = uint64(finalEnd * 1000)
 		}
 	}
 
